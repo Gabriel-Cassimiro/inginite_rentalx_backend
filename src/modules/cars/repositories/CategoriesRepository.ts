@@ -1,20 +1,20 @@
 import { Category } from "../entities/Category"
+import { getRepository, Repository } from "typeorm"
+
 import {
 	ICategoriesRepositories,
 	ICreateCategoryDTO
 } from "./interfaces/ICategoriesRespository"
 
-import { getRepository, Repository } from "typeorm"
-
 class CategoriesRepository implements ICategoriesRepositories {
 	private repository: Repository<Category>
 	private static INSTACE: CategoriesRepository
 
-	private constructor() {
+	// Singleton
+	constructor() {
 		this.repository = getRepository(Category)
 	}
 
-	// Singleton
 	public static getInstance(): CategoriesRepository {
 		if (!CategoriesRepository.INSTACE) {
 			CategoriesRepository.INSTACE = new CategoriesRepository()
@@ -25,6 +25,7 @@ class CategoriesRepository implements ICategoriesRepositories {
 
 	async create({ description, name }: ICreateCategoryDTO): Promise<void> {
 		const category = this.repository.create()
+
 		Object.assign(category, { name, description, created_at: new Date() })
 
 		await this.repository.save(category)
